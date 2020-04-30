@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title> HAFIZA OYUNU </title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    const StopWatch = function StopWatch() {
+      const self = this;
+      let hours = 0;
+      let minutes = 0;
+      let seconds = 0;
+      let timer;
+      let on = false;
+
+      self.startTimer = function(callback) {
+        if(on === true) { console.log('timer is already on.'); return; }
+          on = true;
+          timer = setInterval(function(){
+          seconds++;
+          if(seconds === 60) {
+            seconds = 0;
+            minutes++;
+          if(minutes === 60) {
+            minutes = 0;
+            hours++;
+          }
+        }
+        if(callback && callback.constructor === Function) {
+          callback();
+        }
+      }, 1000);
+      console.log('timer started');
+    }
+
+    self.stopTimer = function() {
+      clearInterval(timer);
+        on = false;
+        console.log('timer ended: ', self.getTimeString());
+      }
+
+      self.resetTimer = function() {
+        self.stopTimer();
+        hours = 0;
+        minutes = 0;
+        seconds = 0;
+      }
+
+      self.getTimeString = function() {
+        let hour = hours > 9 ? String(hours) : '0' + String(hours);
+        let minute = minutes > 9 ? String(minutes) : '0' + String(minutes);
+        let second = seconds > 9 ? String(seconds) : '0' + String(seconds);
+        let timeString = hour + ':' + minute + ':' + second;
+        return timeString;
+      }
+
+      self.getTimeObj = function() {
+        return {
+          hours: hours,
+          minutes: minutes,
+          seconds: seconds
+        };
+      }
+  
+      self.getTimeObjFormatted = function() {
+        return {
+          hours: hours > 9 ? String(hours) : '0' + String(hours),
+          minutes: minutes > 9 ? String(minutes) : '0' + String(minutes),
+          seconds: seconds > 9 ? String(seconds) : '0' + String(seconds)
+        };
+      }
+  
+      self.getHours = function() {
+        return hours;
+      }
+
+      self.getMinutes = function() {
+        return minutes;
+      }
+
+      self.getSeconds = function() {
+        return seconds;
+      }
+    }
+  </script>
+
+  <style>
+    html {
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    } 
+    body {
+      background: #ffffff url('https://www.spoune.com/images/memphis-colorful.png'); 
+      font-family: 'Coda', cursive;
+    }
+    .text-center {
+      text-align: center;
+    }
+    h1 {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 300;
+    } 
+    .deck {
+      width: 660px;
+      max-width: 100%;
+      min-height: 680px; */
+      background: linear-gradient(160deg, #02ccba 0%, #aa7ecd 100%);
+      padding: 32px;
+      border-radius: 10px;
+      box-shadow: 0px 1px 3px 0 rgba(46, 61, 73, 0.5);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0 0 3em;
+    }
+
+    .deck .card {
+      height: 125px;
+      width: 125px;
+      background: #2e3d49;
+      font-size: 0;
+      color: #ffffff;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 5px 2px 20px 0 rgba(46, 61, 73, 0.5);
+    }
+
+    .deck .card.open {
+      transform: rotateY(0);
+      background: #E6E6FA;
+      cursor: default;
+    }
+
+    .deck .card.show {
+      font-size: 33px;
+    }
+
+    .deck .card.match {
+      cursor: default;
+      background: #87CEEB;
+      font-size: 33px;
+    }
+
+    .score-panel {
+      text-align: left;
+      width: 625px;
+      margin-bottom: 10px;
+      max-width: 100%;
+    }
+
+    .middle-box {
+      width: 660px;
+      max-width: 100%;
+      display: block;
+      margin: auto;
+    }
+
+    .score-panel .stars {
+      margin: 0;
+      padding: 0;
+      display: inline-block;
+      margin: 0 5px 0 0;
+    }
+
+    .score-panel .stars li {
+      list-style: none;
+      display: inline-block;
+    }
+
+    .score-panel .restart, .score-panel .hint {
+      margin-left: 15px;
+      float: right;
+      cursor: pointer;
+    }
+
+    #deck {
+      padding: 32px;
+      margin-left: auto; 
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="middle-box">
+    <header>
+      <h4 class="text-center"> Hafıza Oyunu </h4>
+    </header>
+
+    <section class="score-panel">
+      <ul id="stars-list" class="stars">
+        <li><i class="fa fa-star"></i></li>
+        <li><i class="fa fa-star"></i></li>
+        <li><i class="fa fa-star"></i></li>
+      </ul>
+      <span id="grade" class="moves"></span>
+
+      <span style="margin: 0px 20px;">
+        <strong><span id="moves-text"></span></strong> .Hamle
+      </span>
+
+      <span style="margin: 0px 20px;">
+        <strong><span id="time-text"></span></strong>
+      </span>
+
+      <span style="margin: 0px 20px;">
+        <strong><span id="msg-text"></span></strong>
+      </span>
+
+      <div id="info-btn" class="hint">
+        <span></span>
+      </div>
+      <div id="reset-btn" class="restart">
+        <span><i class="fa fa-repeat"></i> Tekrar </span>
+      </div>
+    </section>
+
+    <ul id="deck" class="deck" ></ul>
+  </div>
+
+  <div id="game_modal" class="modal">
+    <div class="modal-content">
+      <p><strong>Süre: </strong> <span id="time_results"></span></p>
+      <p><strong>Hamle Sayısı: </strong> <span id="moves_results"></span></p>
+
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat"> Kapat </a>
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat" id="modal_reset_btn"> Tekrar </a>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function(){
+      $('.modal').modal();
+
+      let cardClassesList = [
+        'fa-diamond',
+        'fa-diamond',
+        'fa-paper-plane-o',
+        'fa-paper-plane-o',
+        'fa-anchor',
+        'fa-anchor',
+        'fa-bolt',
+        'fa-bolt',
+        'fa-cube',
+        'fa-cube',
+        'fa-bomb',
+        'fa-bomb',
+        'fa-bicycle',
+        'fa-bicycle',
+        'fa-leaf',
+        'fa-leaf'
+      ];
+
+    let watch = new StopWatch();
+
+    let modal = document.getElementById('game_modal');
+    let modal_instance = M.Modal.getInstance(modal);
+    let deck = document.getElementById('deck');
+    let gradeSpan = document.getElementById('grade');
+    let starsList = document.getElementById('stars-list');
+    let resetBtn = document.getElementById('reset-btn');
+    let infoBtn = document.getElementById('info-btn');
+    let msgText = document.getElementById('msg-text');
+    let movesText = document.getElementById('moves-text');
+    let timeText = document.getElementById('time-text');
+
+    let time_results = document.getElementById('time_results');
+    let moves_results = document.getElementById('moves_results');
+
+    let modal_reset_btn = document.getElementById('modal_reset_btn');
+
+    let moves = 0;
+    let grade = '';
+
+    let isGameOver = false;
+    let didGameStart = false;
+
+    let matches = [];
+    let lastFlipped = null;
+    let pause = false;
+
+    gradeSpan.innerText = grade;
+    movesText.innerText = moves;
+    timeText.innerText = watch.getTimeString();
+
+    function shuffle(array) {
+      var currentIndex = array.length, temporaryValue, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+      return array;
+    }
+
+    function createCard(card_class) {
+      let li = document.createElement('li');
+      li.classList.add('card');
+      li.classList.add('card-' + card_class);
+      li.setAttribute('data-card', card_class);
+      let i = document.createElement('i');
+      i.classList.add('card-icon', 'fa', card_class);
+      i.setAttribute('data-card', card_class);
+      li.appendChild(i);
+      return li;
+    }
+
+    resetBtn.addEventListener('click', resetGame);
+    modal_reset_btn.addEventListener('click', resetGame);
+    //infoBtn.addEventListener('click', info);
+
+    function updateGrade() {
+      if(moves > 12) {
+        if(grade !== "Average") {
+          grade = "Average";
+          gradeSpan.innerText = grade;
+          starsList.removeChild(starsList.children[0]);
+        }
+      }
+      if(moves > 24) {
+        if(grade !== "Poor...") {
+          grade = "Poor...";
+          gradeSpan.innerText = grade;
+          starsList.removeChild(starsList.children[0]);
+        }
+      }
+    }
+
+    function clearDeck() {
+      deck.innerHTML = '';
+    }
+
+    function generateCards() {
+      let card_classes = shuffle(cardClassesList);
+      for(let index = 0; index < 16; index++) {
+        let card_class = card_classes[index];
+        let new_elm = createCard(card_class);
+        deck.appendChild(new_elm);
+      }
+    }
+
+    function activateCards() {
+      document.querySelectorAll('.card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          if(didGameStart === false) {
+            didGameStart = true;
+            watch.startTimer(function(){
+              timeText.innerText = watch.getTimeString();
+            });
+          }
+          if (card === lastFlipped || matches.includes(card) || pause || isGameOver) {
+            return;
+          }
+
+          card.classList.add('open', 'show');
+
+          if (lastFlipped) { 
+            let thisCard = card.childNodes[0].getAttribute('data-card');
+            let lastCard = lastFlipped.childNodes[0].getAttribute('data-card');
+            moves++;
+            movesText.innerText = moves;
+            updateGrade();
+
+            if (thisCard === lastCard) {
+              let message = '';
+              console.log(message);
+              flash_msg(message);
+              card.classList.add('match');
+              lastFlipped.classList.add('match');
+              matches.push(card);
+              matches.push(lastFlipped);
+              lastFlipped = null;
+              if(matches.length === 16) {
+                gameOver();
+                return;
+              }
+            }
+            else {
+              let message = '';
+              console.log(message);
+              flash_msg(message);
+              pause = true;
+              setTimeout(function() {
+              card.classList.remove('open', 'show');
+              lastFlipped.classList.remove('open', 'show');
+              lastFlipped = null;
+              pause = false;
+            }, 1725);
+          }
+        }
+        else {
+          lastFlipped = card;
+        }
+      });
+    });
+  }
+
+    function getRandomItem(array_obj) {
+      return array_obj[Math.floor(Math.random() * array_obj.length)];
+    }
+
+    function hint() {
+      let hiddenCards = Array.from(document.querySelectorAll('.card')).filter(function(card){
+        return card.classList.contains('open') === false;
+      });
+      let cardItem = getRandomItem(hiddenCards);
+      let card_name = '.card-' + cardItem.getAttribute('data-card');
+
+      pause = true;
+      document.querySelectorAll(card_name).forEach(function(card) {
+        card.classList.add('open', 'show');
+      });
+      setTimeout(function(){
+        document.querySelectorAll(card_name).forEach(function(card) {
+        card.classList.remove('open', 'show');
+      });
+      pause = false;
+      }, 3000);
+    }
+
+    function start() {
+      generateCards();
+      activateCards();
+      flash_cards();
+    }
+
+    function gameOver() {
+      isGameOver = true;
+      watch.stopTimer();
+
+      grade_results.innerText = grade;
+      moves_results.innerText = moves;
+      time_results.innerText = watch.getTimeString();
+
+      modal_instance.open();
+    }
+
+    function resetGame(e) {
+      if(e && e.preventDefault) { 
+        e.preventDefault();
+      }
+
+      clearDeck();
+      generateCards();
+      activateCards();
+      flash_cards();
+      watch.resetTimer();
+
+      moves = 0;
+      isGameOver = false;
+      matches = [];
+      lastFlipped = null;
+      pause = false;
+      didGameStart = false;
+
+      starsList.innerHTML = '';
+      starsList.innerHTML += '<li><i class="fa fa-star"></i></li>';
+      starsList.innerHTML += '<li><i class="fa fa-star"></i></li>';
+      starsList.innerHTML += '<li><i class="fa fa-star"></i></li>';
+      gradeSpan.innerText = grade;
+      movesText.innerText = moves;
+      timeText.innerText = watch.getTimeString();
+
+      flash_msg('Yeni Oyun!');
+      }
+
+    function flash_msg(message) {
+      msgText.innerText = message;
+      setTimeout(function(){ msgText.innerText = ''; }, 1725);
+    }
+
+    function flash_cards() {
+      document.querySelectorAll('.card').forEach(function(card) {
+        card.classList.add('open', 'show');
+      });
+      setTimeout(function(){
+        document.querySelectorAll('.card').forEach(function(card) {
+          card.classList.remove('open', 'show');
+        });
+      }, 3000);
+  }
+  start();
+});
+  </script>
+</body>
+</html>
